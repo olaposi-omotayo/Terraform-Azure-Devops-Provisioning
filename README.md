@@ -2,18 +2,34 @@
 C++ implementation of a "count face" script that counts the faces in an input picture array using the multilayer perceptron
 # Approach
 <ul>
-  <li>resize each image</li>
-  <li>load strings of weight and biases</li>
-  <li>design a multilayer perceptor</li>
+  <li>generate keys imperatively</li>
+  <li>Use terraform.tf file provision infrastructure on Azure</li>
+  <li>Create declarative CICD pipeline that contains validation and deployment stages</li>
 </ul>
 
-## Code structure
-#### define characters 
-Get character from stdin. Returns the next character from the standard input (stdin)
+## Generate required keys
+#### 
+create a resource group on azure
 ```
-define getchar
+az group create -l westus -n terraform-test
 ``` 
-#### get and resizes the input dimension
+#### create service principle to connect azure cloud to Azure DevOps
 ```
-struct Mat1d
+az ad sp create-for-rbac -n terraform-test --role contributor --scopes <azure resource group id>
+``` 
+#### 
+Goto Azure DevOps to create service connection in the azure resource manager and use the service principle already created and authenticat 
+
+create a blob storage for Terraform state file
+```
+az storage account create --resource-group terraform-test --name test-account --sku standard_LRS --encryption-service blob
+``` 
+#### get the key
+```
+az storage account keys list --resource-group terraform-test --account-name test-account
+``` 
+
+#### get the value of the key and create a container within the blob
+```
+az storage container create --name test-container --account-name test-account --account-key <paste account key>
 ``` 
