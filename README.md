@@ -1,5 +1,5 @@
 # Terraform Provisioning on Azure with AzureDevops CICD
-C++ implementation of a "count face" script that counts the faces in an input picture array using the multilayer perceptron
+This repo shows how Terraform can be used to provision infrastructure on Azure cloud and how automation can be done using Azure DevOps CiCd declarative file that contain various steps involved in validation and deployment on cloud
 # Approach
 <ul>
   <li>generate keys imperatively</li>
