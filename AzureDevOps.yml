@@ -1,0 +1,63 @@
+stages:
+  - stage: validate
+    jobs:
+      - job: validate
+        continueOnError: false
+        steps:
+          - task: TerraformInstaller
+            displayName: 'install'
+            inputs:
+              terraformVersion: 'latest'
+          - task: TerraformTaskV1
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceRm: 'azure-spm'
+              backendAzureRmResourceGroupName: 'terraform-test'
+              backendAzureRunStorageAccountName: 'test-account'
+              backendAzureRunContainerName: 'sktfcontainer'
+              backendAzureRmKey: 'terraform.tfstate'
+          - task: TerraformTaskV1
+            displayName: 'validate'
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+
+  - stage: deploy
+    jobs:
+    - deployment: deploy_terraform
+      continueOnError: false
+      environment: 'dev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+            - task: TerraformInstaller
+              displayName: 'Install'
+              inputs:
+                terraformVersion: 'latest'
+            - task: TerraformTaskV1
+              displayName: 'init'
+              inputs:
+                provider: 'azurerm'
+                  command: 'init'
+                  backendServiceRm: 'azure-spm'
+                  backendAzureRmResourceGroupName: 'terraform-test'
+                  backendAzureRunStorageAccountName: 'test-account'
+                  backendAzureRunContainerName: 'sktfcontainer'
+                  backendAzureRmKey: 'terraform.tfstate'
+            - task: TerraformTaskV1
+              displayName: 'plan'
+              inputs:
+                provider: 'azurerm'
+                command: 'plan'
+                environmentServiceNameAzureRm: 'azure-spm'
+            - task: TerraformTaskV1
+              displayName: 'apply'
+              inputs:
+                provider: 'azurerm'
+                command: 'apply'
+                environmentServiceNameAzureRm: 'azure-spm'
+
+
